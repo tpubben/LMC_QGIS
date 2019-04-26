@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/methane_mini" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
