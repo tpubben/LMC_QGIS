@@ -21,10 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog
-import tempfile
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -35,7 +34,7 @@ import os.path
 
 # Import QGIS modules
 
-# from qgis.core import QgsProject
+from qgis.core import *
 
 
 class GasDataProcessor:
@@ -187,13 +186,13 @@ class GasDataProcessor:
 
     def selectExportFiles(self):
         """Locates the text/csv files for import"""
-        class_variables.exportFilename, _filter = QFileDialog.getOpenFileNames(self.dlg, "Select Input Files", '',
+        class_variables.export_filename, _filter = QFileDialog.getOpenFileNames(self.dlg, "Select Input Files", '',
                                                                                '*.csv *.txt')
-        self.dlg.listWidget.clear()
+        self.dlg.listWidget1.clear()
         try:
-            self.dlg.listWidget.addItem(class_variables.exportFilename)
+            self.dlg.listWidget1.addItem(class_variables.export_filename)
         except:
-            self.dlg.listWidget.addItems(class_variables.exportFilename)
+            self.dlg.listWidget1.addItems(class_variables.export_filename)
 
     def run(self):
         """Run method that performs all the real work"""
@@ -203,7 +202,7 @@ class GasDataProcessor:
         if self.first_start == True:
             self.first_start = False
             self.dlg = GasDataProcessorDialog()
-            self.dlg.pushButton.clicked.connect(self.selectExportFiles)
+            self.dlg.openFileButton.clicked.connect(self.selectExportFiles)
 
         # show the dialog
         self.dlg.show()
@@ -211,18 +210,38 @@ class GasDataProcessor:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code
-            memoryFile = tempfile.TemporaryFile('a')
-            memoryFile.write('gas_value,latitude,longitude\n')
-            for item in class_variables.exportFilename:
+            output_layer_name = self.dlg.outputLayerName.text() # pull the layer out of the input box
+
+            # create the layer in memory
+            gas_layer = QgsVectorLayer('Point', output_layer_name, 'memory')
+            # set the CRS to ESPG 4326 WGS84
+            gas_layer.setCrs(QgsCoordinateReferenceSystem(4326))
+            pr = gas_layer.dataProvider()  # starts the data provider
+            gas_layer.startEditing()
+            pr.addAttributes([QgsField('GasReading', QVariant.Double)])  # creates a float field for gas readings
+
+            # iterate through all files in the import box and add them as points to the layer
+            for item in class_variables.export_filename:
                 file = open(item)
                 for line in file:
-                    if line.startswith('n'):
+                    if line.startswith('n'):  # ignores the first line of the text output since it starts with "name"
                         continue
                     else:
-                        memoryFile.write(line)
+                        sl = line.strip().split(',')  # strips newline and splits on comma
+                        gas_reading, ycoord, xcoord = float(sl[0]), float(sl[1]), float(sl[2])
+
+                    # add point feature for each reading
+                    pnt = QgsFeature()
+                    pnt.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(xcoord,ycoord)))
+                    pnt.setAttributes([gas_reading])
+                    pr.addFeatures([pnt])
+
+                    gas_layer.commitChanges()
+
+            QgsProject.instance().addMapLayer(gas_layer)
+
 
 
 class class_variables:
-    exportFilename = []
+    export_filename = []
+    output_filename = ''

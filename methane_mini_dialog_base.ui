@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>665</width>
-    <height>385</height>
+    <width>569</width>
+    <height>364</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>210</x>
      <y>320</y>
      <width>341</width>
      <height>32</height>
@@ -29,27 +29,63 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
+  <widget class="QListWidget" name="listWidget1">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>60</y>
+     <x>10</x>
+     <y>30</y>
      <width>551</width>
      <height>192</height>
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="openFileButton">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>260</y>
+     <x>10</x>
+     <y>230</y>
      <width>93</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
     <string>Open Files</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="OpenFilesLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>111</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Open Gas Export Files</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="SaveNameLabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Output Layer Name</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="outputLayerName">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>280</y>
+     <width>381</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>
